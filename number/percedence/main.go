@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strconv"
+)
 
 func main() {
 
@@ -54,5 +58,21 @@ func main() {
 
 	// exercise: feet to meter
 	// strconv: allows you to convert basic values from/to a string value
+	arg := os.Args[1] // user input, first element is the path where package work
+
+	feet, _ := strconv.ParseFloat(arg, 64)
+	fmt.Printf("Type of feet: %T\n", feet)
+
+	meters := feet * 0.3048
+	fmt.Printf("%g feet equals to %g meters\n", feet, meters)
+
+	// exercise: Celsius to Fahrenheit
+	arg2 := os.Args[2]
+
+	degree, _ := strconv.ParseFloat(arg2, 64)
+
+	faDegree := degree*1.8 + 32
+
+	fmt.Printf("%g celius equals to %g fahrenheit\n", degree, faDegree)
 
 }
