@@ -16,60 +16,69 @@ type parser struct {
 	domains []string          //  unique domain names
 	total   int               // total visits to all domains
 	lines   int
+	lerr    error
 }
 
-func newParser() parser {
+func newParser() *parser {
 	// constructor pattern
-	return parser{
+	return &parser{
 		sum: make(map[string]result),
 	}
 }
 
-func parse(p *parser, line string) (parsed result, err error) {
+func parse(p *parser, line string) (r result) {
 
-	// var (
-	// 	parsed result
-	// 	err    error
-	// )
+	if p.lerr != nil {
+		return
+	}
+
 	p.lines++
 
 	fields := strings.Fields(line)
 
 	if len(fields) != 2 {
-		err = fmt.Errorf("wrong input: %v (line #%d)", fields, p.lines)
+		p.lerr = fmt.Errorf("wrong input: %v (line #%d)", fields, p.lines)
 		// return parsed, err
 		return
 	}
 
-	// fmt.Printf("domain: %s - visits: %s\n", fields[0], fields[1])
-	parsed.domain = fields[0]
-	parsed.visits, err = strconv.Atoi(fields[1])
+	var err error
 
-	if parsed.visits < 0 || err != nil {
-		err = fmt.Errorf("wrong input: %v (line #%d)", fields[1], p.lines)
+	// fmt.Printf("domain: %s - visits: %s\n", fields[0], fields[1])
+	r.domain = fields[0]
+	r.visits, err = strconv.Atoi(fields[1])
+
+	if r.visits < 0 || err != nil {
+		p.lerr = fmt.Errorf("wrong input: %v (line #%d)", fields[1], p.lines)
 		// fmt.Println("Wrong input!", fields[1])
 		// return parsed, err
-		return
+		// return
 	}
 
 	// return parsed, err
 	return
 }
 
-func update(p *parser, parsed result) {
-	domain, visits := parsed.domain, parsed.visits
-
-	if _, ok := p.sum[domain]; !ok {
-		p.domains = append(p.domains, domain)
+func update(p *parser, r result) {
+	if p.lerr != nil {
+		return
 	}
 
-	p.total += visits
+	if _, ok := p.sum[r.domain]; !ok {
+		p.domains = append(p.domains, r.domain)
+	}
 
-	p.sum[domain] = result{
-		domain: domain,
-		// visits: visits + p.sum[domain].visits,
+	p.total += r.visits
+
+	p.sum[r.domain] = result{
+		domain: r.domain,
+		visits: r.visits + p.sum[r.domain].visits,
 		// map elements are not addressable values
 	}
-	clone := p.sum[domain]
+	clone := p.sum[r.domain]
 	_ = &clone
+}
+
+func err(p *parser) error {
+	return p.lerr
 }

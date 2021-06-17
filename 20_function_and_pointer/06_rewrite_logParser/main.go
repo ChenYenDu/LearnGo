@@ -16,32 +16,32 @@ func main() {
 
 	for in.Scan() {
 
-		parsed, err := parse(&p, in.Text())
-
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		update(&p, parsed)
+		parsed := parse(p, in.Text())
+		update(p, parsed)
 
 	}
 
 	summarize(p)
 
-	if err := in.Err(); err != nil {
-		fmt.Println("> Err:", err)
+	dumpErr([]error{in.Err(), err(p)})
+
+}
+
+func dumpErr(errs []error) {
+	for _, err := range errs {
+		if err != nil {
+			fmt.Println("> Err:", err)
+		}
 	}
 }
 
-func summarize(p parser) {
+func summarize(p *parser) {
 	fmt.Printf("%-30s %10s\n", "DOMAIN", "VISITS")
 	fmt.Println(strings.Repeat("-", 45))
 
 	sort.Strings(p.domains)
 	for _, domain := range p.domains {
-		parsed := p.sum[domain]
-		fmt.Printf("%-30s %10d\n", domain, parsed.visits)
+		fmt.Printf("%-30s %10d\n", domain, p.sum[domain].visits)
 	}
 	fmt.Printf("\n%-30s %10d\n", "TOTAL", p.total)
 }
