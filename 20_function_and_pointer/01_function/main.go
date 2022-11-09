@@ -1,79 +1,58 @@
 package main
 
-import (
-	"fmt"
-	"strconv"
-)
+import "fmt"
 
 func main() {
-	local := 10
-	show(local)
+	fmt.Println(f1("This is p1", 1)) /* 1 Thi is P2 */
+	fmt.Println(f2("This is p1", 2)) /* 2 This is P1 */
+	squareFunc := returnSquares()
+	f := squareFunc()
+	fmt.Println(f())
+	fmt.Println(f())
 
-	incrWrong(local)
-	fmt.Printf("show -> local = %d\n", local)
-
-	local = incr(local)
-	fmt.Printf("show -> local = %d\n", local)
-
-	local = incrBy(local, 5)
-	fmt.Printf("show -> local = %d\n", local)
-
-	_, err := incrByStr(local, "TWO")
-
-	if err != nil {
-		fmt.Printf("err -> %d\n", err)
-	}
-
-	local, _ = incrByStr(local, "2")
-	fmt.Printf("show -> local = %d\n", local)
-
-	show(incrBy(local, 2))
-	show(local)
-
-	local = santize(incrByStr(local, "2"))
-	show(local)
-
-	local = limit(incrBy(local, 5), 500)
-	show(local)
-
+	r := returnSquares()
+	rTest := r()
+	fmt.Println(rTest())
+	fmt.Println(rTest())
 }
 
-func show(n int) {
-	fmt.Printf("show -> n = %d\n", n)
+func f1(p1 string, p2 int) (r1 int, r2 string) {
+	r1 = p2
+	r2 = p1
+	return r1, r2
 }
 
-func incrWrong(n int) {
-	n++
-}
-
-func incr(n int) int {
-	n++
-	return n
-}
-
-func incrBy(n, factor int) int {
-	return n * factor
-}
-
-func incrByStr(n int, factor string) (int, error) {
-	m, err := strconv.Atoi(factor)
-
-	n = incrBy(n, m)
-	return n, err
-}
-
-func santize(n int, err error) int {
-	if err != nil {
-		return 0
-	}
-	return n
-}
-
-func limit(n int, lim int) (m int) {
-	m = n
-	if m >= lim {
-		return lim
-	}
+func f2(p1 string, p2 int) (r1 int, r2 string) {
+	/*
+		var r1 int
+		var r2 int
+	*/
+	r1 = p2
+	r2 = p1
 	return
-	// when there is named return variable, this equals to `return m`
+}
+
+// func sum(vals ...int, strs ...string) int {
+// 	total := 0
+// 	for _, val := range vals {
+// 		total += val
+// 	}
+// 	for _, s := range strs {
+// 		fmt.Println(s)
+// 	}
+// 	return total
+// }
+
+func squares() func() int {
+	var x int = 2
+	return func() int {
+		x++
+		return x * x
+	}
+}
+
+// f -> fun() int{x++ return x * x}
+
+func returnSquares() func() func() int {
+	return squares
 }
